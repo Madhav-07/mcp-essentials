@@ -4,7 +4,8 @@
     "validate": "pnpm --filter @commercetools/agent-essentials run validate && pnpm --filter @commercetools/mcp-essentials run validate",
     "build": "pnpm --filter @commercetools/agent-essentials run build && pnpm --filter @commercetools/mcp-essentials run build",
     "changeset": "changeset",
-    "changeset:version": "changeset version"
+    "changeset:version": "changeset version",
+    "start": "pnpm build && node modelcontextprotocol/dist/index.js"
   },
   "dependencies": {
     "@changesets/changelog-github": "0.5.1",

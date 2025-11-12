@@ -425,6 +425,7 @@ export async function main() {
     const port = env.port || 8080;
     streamServer.listen(port, function () {
       console.error(`Stream server listening on`, port);
+      console.error('Stateless mode:', env.stateless ? 'enabled' : 'disabled');
     });
   } else {
     const server = await getServer();
