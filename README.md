@@ -5,6 +5,88 @@
 
 This repository contains both a MCP server (which you can integrate with many MCP clients) and agent essentials that can be used from within agent frameworks.
 
+## Remote MCP Server with OAuth Support
+
+This MCP server supports running as a remote HTTP server with OAuth 2.0 authentication for machine-to-machine (M2M) flows. This enables MCP clients like the MCP Inspector to discover OAuth endpoints and authenticate securely.
+
+### Quick Start - Remote Server with OAuth
+
+Create a `.env` file in your project root:
+
+```bash
+TOOLS=all
+AUTH_TYPE=client_credentials
+CLIENT_ID=your_client_id
+CLIENT_SECRET=your_client_secret
+PROJECT_KEY=your_project_key
+AUTH_URL=https://auth.us-central1.gcp.commercetools.com
+API_URL=https://api.us-central1.gcp.commercetools.com
+REMOTE=true
+LOGGING=true
+PORT=10001
+STATELESS=true
+```
+
+Then run:
+
+```bash
+pnpm start
+```
+
+### OAuth Discovery Endpoints
+
+When running in remote mode, the server automatically exposes OAuth discovery endpoints:
+
+- `GET /.well-known/oauth-protected-resource` - Resource server metadata
+- `GET /.well-known/oauth-authorization-server` - OAuth server metadata
+- `POST /oauth/token` - Token endpoint for client credentials exchange
+- `POST /mcp` - MCP protocol endpoint (requires Bearer token)
+
+### Testing OAuth Flow
+
+```bash
+# 1. Discover OAuth metadata
+curl http://localhost:10001/.well-known/oauth-authorization-server
+
+# 2. Get access token
+curl -X POST http://localhost:10001/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET"
+
+# 3. Use token with MCP endpoint
+curl -X POST http://localhost:10001/mcp \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{"jsonrpc": "2.0", "method": "initialize", "params": {...}, "id": 1}'
+```
+
+### Using with MCP Inspector
+
+The MCP Inspector can automatically discover and authenticate with your server:
+
+1. Start your server: `pnpm start`
+2. Open MCP Inspector at `http://localhost:6274`
+3. Enter your server URL: `http://localhost:10001`
+4. The Inspector will discover OAuth endpoints and prompt for credentials
+5. Enter your commercetools client credentials
+6. Start using your MCP tools!
+
+### Remote Server Configuration Options
+
+| Option       | Description                                                          | Default       |
+| ------------ | -------------------------------------------------------------------- | ------------- |
+| `--remote`   | Enable remote HTTP server mode                                       | `false`       |
+| `--port`     | Port to listen on                                                    | `8080`        |
+| `--stateless`| Run in stateless mode (each request is independent)                 | `true`        |
+| `--logging`  | Enable detailed request/response logging                            | `false`       |
+
+---
+
+# Offical README.md contents
+↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
 # commercetools Model Context Protocol
 
 ## Setup
