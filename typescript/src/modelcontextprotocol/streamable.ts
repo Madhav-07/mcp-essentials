@@ -343,9 +343,38 @@ export default class CommercetoolsAgentEssentialsStreamable {
           }
         }
 
-        console.error(
-          `[MCP] Handling request: ${(req.body as {method?: string})?.method || 'unknown method'}`
-        );
+        const method = (req.body as {method?: string})?.method || 'unknown method';
+        console.error(`[MCP] Handling request: ${method}`);
+
+        // Add logging for tools/list responses to see available tools
+        if (method === 'tools/list') {
+          const originalJson = res.json.bind(res);
+          res.json = ((body: any) => {
+            try {
+              const tools =
+                (body && (body as any).result && (body as any).result.tools) ||
+                (body && (body as any).tools);
+              if (Array.isArray(tools)) {
+                const toolNames = tools
+                  .map((tool: any) => tool?.name)
+                  .filter(Boolean);
+                console.error(
+                  '[MCP] tools/list returned tools:',
+                  toolNames
+                );
+              } else {
+                console.error(
+                  '[MCP] tools/list response does not contain a tools array',
+                  body
+                );
+              }
+            } catch (e) {
+              console.error('[MCP] Error logging tools/list response', e);
+            }
+            return originalJson(body);
+          }) as typeof res.json;
+        }
+
         // finally handle requests
         await transport.handleRequest(req, res, req.body);
         console.error('[MCP] ✅ Request handled successfully');
