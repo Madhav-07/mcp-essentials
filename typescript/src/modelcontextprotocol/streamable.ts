@@ -74,7 +74,10 @@ export default class CommercetoolsAgentEssentialsStreamable {
      */
     this.app.get('/.well-known/oauth-protected-resource', (req, res) => {
       console.error('[OAuth Discovery] Serving protected resource metadata');
-      const baseUrl = `http://localhost:${port}`;
+      const baseUrl =
+        process.env.MCP_BASE_URL ||
+        process.env.OAUTH_BASE_URL ||
+        `http://localhost:${port}`;
       const response = {
         resource: `${baseUrl}/mcp`,
         authorization_servers: [`${baseUrl}/oauth`],
@@ -92,7 +95,10 @@ export default class CommercetoolsAgentEssentialsStreamable {
      */
     this.app.get('/.well-known/oauth-authorization-server', (req, res) => {
       console.error('[OAuth Discovery] Serving authorization server metadata');
-      const baseUrl = `http://localhost:${port}`;
+      const baseUrl =
+        process.env.MCP_BASE_URL ||
+        process.env.OAUTH_BASE_URL ||
+        `http://localhost:${port}`;
       const response = {
         issuer: `${baseUrl}/oauth`,
         authorization_endpoint: `${baseUrl}/oauth/authorize`,
